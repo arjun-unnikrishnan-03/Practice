@@ -76,6 +76,39 @@ const addNote = (text = "", title = "") => {
     main.appendChild(note);
     saveNotes();
 };
+//searchnotes
+
+// Search notes function
+function searchNotes() {
+    const query = document.querySelector("#searchBar").value.toLowerCase();
+    const notes = document.querySelectorAll(".note");
+
+    let found = false;
+
+    notes.forEach((note) => {
+        const title = note.querySelector(".title").value.toLowerCase();
+        const content = note.querySelector(".content").value.toLowerCase();
+
+        if (title.includes(query) || content.includes(query)) {
+            found = true;
+        }
+    });
+
+    if (found) {
+        alert("Found ✅");
+    } else {
+        alert("Not Found ❌");
+    }
+}
+
+const searchBox = document.querySelector("#searchBar");
+searchBox.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); 
+        searchNotes();
+    }
+});
+
 
 // Load saved notes
 function loadNotes() {
