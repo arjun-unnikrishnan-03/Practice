@@ -8,36 +8,24 @@ addBtn.addEventListener("click", function () {
 
 // Save button function
 const saveNotes = () => {
-
-    // Select content textareas
-    const notes = 
-        document.querySelectorAll(".note .content"); 
-        
-    // Select title textareas
-    const titles = 
-        document.querySelectorAll(".note .title"); 
+    const notes = document.querySelectorAll(".note .content");
+    const titles = document.querySelectorAll(".note .title");
 
     const data = [];
 
     notes.forEach((note, index) => {
         const content = note.value;
         const title = titles[index].value;
-        console.log(title);
         if (content.trim() !== "") {
             data.push({ title, content });
         }
     });
 
-    const titlesData = 
-        data.map((item) => item.title);
-    console.log(titlesData);
-    localStorage.setItem(
-        "titles", JSON.stringify(titlesData));
+    const titlesData = data.map((item) => item.title);
+    const contentData = data.map((item) => item.content);
 
-    const contentData = 
-        data.map((item) => item.content);
-    localStorage.setItem(
-        "notes", JSON.stringify(contentData));
+    localStorage.setItem("titles", JSON.stringify(titlesData));
+    localStorage.setItem("notes", JSON.stringify(contentData));
 };
 
 // Addnote button function
@@ -46,51 +34,55 @@ const addNote = (text = "", title = "") => {
     note.classList.add("note");
     note.innerHTML = `
     <div class="icons">
-         <i class="save fas fa-save" 
-             style="color:red">
-         </i>
-         <i class="trash fas fa-trash" 
-             style="color:yellow">
-         </i> 
+         <i class="save fas fa-save" style="color:red" title="Save"></i>
+         <i class="edit fas fa-edit" style="color:green" title="Edit"></i>
+         <i class="trash fas fa-trash" style="color:yellow" title="Delete"></i> 
     </div>
     <div class="title-div">
-        <textarea class="title" 
-            placeholder="Write the title ...">${title}
-        </textarea>
+        <textarea class="title" placeholder="Write the title ..." disabled>${title}</textarea>
     </div>
-    <textarea class="content" 
-        placeholder="Note down your thoughts ...">${text}
-    </textarea>
+    <textarea class="content" placeholder="Note down your thoughts ..." disabled>${text}</textarea>
     `;
+
+
+    const titleArea = note.querySelector(".title");
+    const contentArea = note.querySelector(".content");
+
     function handleTrashClick() {
         note.remove();
         saveNotes();
     }
+
     function handleSaveClick() {
+        titleArea.disabled = true;
+        contentArea.disabled = true;
         saveNotes();
     }
+
+    function handleEditClick() {
+        titleArea.disabled = false;
+        contentArea.disabled = false;
+        titleArea.focus();
+    }
+
     const delBtn = note.querySelector(".trash");
     const saveButton = note.querySelector(".save");
-    const textareas = note.querySelectorAll("textarea");
+    const editButton = note.querySelector(".edit");
 
     delBtn.addEventListener("click", handleTrashClick);
     saveButton.addEventListener("click", handleSaveClick);
+    editButton.addEventListener("click", handleEditClick);
+
     main.appendChild(note);
     saveNotes();
 };
 
-// Loading all the notes those are saved in 
-// the localstorage
+// Load saved notes
 function loadNotes() {
+    const titlesData = JSON.parse(localStorage.getItem("titles")) || [];
+    const contentData = JSON.parse(localStorage.getItem("notes")) || [];
 
-    const titlesData = 
-        JSON.parse(localStorage.getItem("titles")) || [];
-    const contentData = 
-        JSON.parse(localStorage.getItem("notes")) || [];
-        
-    for (let i = 0; 
-            i < Math.max(
-                titlesData.length, contentData.length); i++) {
+    for (let i = 0; i < Math.max(titlesData.length, contentData.length); i++) {
         addNote(contentData[i], titlesData[i]);
     }
 }
